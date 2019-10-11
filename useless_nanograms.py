@@ -18,12 +18,6 @@ nanogram = utilities.update_from_must_fill(nanogram)
 nanogram.printAnsFillCross()
 print(list(nanogram.getAnswer()[1]))
 
-nanogram = utilities.update_to_must_fill_must_cross(nanogram)
-nanogram.printAnsFillCross()
-print('----------')
-nanogram = utilities.update_from_must_fill(nanogram)
-nanogram.printAnsFillCross()
-print(list(nanogram.getAnswer()[1]))
 
 # last_nanogram = copy.deepcopy(nanogram)
 # last_nanogram.must_fill = 0

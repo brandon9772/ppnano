@@ -153,11 +153,9 @@ class Utilities():
         if isRow:
             size_j_range = [0, nanogram.col_size]
             get_mustfill = self.get_must_fill_ij
-            set_must_cross = self.set_must_cross_row
         else:
             size_j_range = [0, nanogram.row_size]
             get_mustfill = self.get_must_fill_ji
-            set_must_cross = self.set_must_cross_col
         if isRow:
             for i in range(start_line, end_line):
                 streak_start = False
@@ -171,22 +169,10 @@ class Utilities():
                         streak += 1
                     else:
                         if streak_start:
-                            nanogram = set_must_cross(
-                                nanogram,
-                                i,
-                                streak_start+1,
-                                streak_start+streak+1
-                            )
                             streak_start = False
                             streak_dict[j-streak] = streak
                             streak = 0
                 if streak_start:
-                    nanogram = set_must_cross(
-                        nanogram,
-                        i,
-                        streak_start+1,
-                        streak_start+streak+1
-                    )
                     streak_start = False
                     streak_dict[j-streak] = streak
                     streak = 0
@@ -218,6 +204,10 @@ class Utilities():
                     for (index, j) in enumerate(nanogram.row_condition[i]):
                         start += j + 1
                         if streak_start <= start:
+                            earliest_start = max(
+                                start + 1,
+                                streak_start + streak + 1
+                            )
                             nanogram.row_condition_potential[
                                 i
                             ][
@@ -230,7 +220,7 @@ class Utilities():
                             ][
                                 index
                             ][
-                                :max(streak_start + j - streak, 0)
+                                :streak_start
                             ] = False
                             if index == len(nanogram.row_condition[i]) - 1:
                                 break
@@ -267,22 +257,10 @@ class Utilities():
                         streak += 1
                     else:
                         if streak_start:
-                            nanogram = set_must_cross(
-                                nanogram,
-                                i,
-                                streak_start+1,
-                                streak_start+streak+1
-                            )
                             streak_start = False
                             streak_dict[j-streak] = streak
                             streak = 0
                 if streak_start:
-                    nanogram = set_must_cross(
-                        nanogram,
-                        i,
-                        streak_start+1,
-                        streak_start+streak+1
-                    )
                     streak_start = False
                     streak_dict[j-streak] = streak
                     streak = 0
@@ -303,19 +281,21 @@ class Utilities():
                                 0
                             )
                         ] = False
-                earliest_start = 0
+
                 # The start must be before this must fill rule.
                 # all consequences is accounted for.
                 # at index is accounted for.
                 # before index is accounted for.
                 # after index is accounted for.
+                start = 0
                 for (streak_start, streak) in streak_dict.items():
-                    start = earliest_start
-                    #####
                     for (index, j) in enumerate(nanogram.col_condition[i]):
                         start += j + 1
                         if streak_start <= start:
-                            #####
+                            start = max(
+                                start + 1,
+                                streak_start + streak + 1
+                            )
                             nanogram.col_condition_potential[
                                 i
                             ][
@@ -328,7 +308,7 @@ class Utilities():
                             ][
                                 index
                             ][
-                                :max(streak_start + j - streak, 0)
+                                :streak_start
                             ] = False
                             if index == len(nanogram.col_condition[i]) - 1:
                                 break
