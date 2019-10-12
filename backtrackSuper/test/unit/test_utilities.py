@@ -3,11 +3,11 @@ import pytest
 from data import Data
 
 data = Data()
-
-
-@pytest.mark.parametrize(data.test_answer())
+@pytest.mark.parametrize(*data.test_answer())
 def test_answer(
-    self,
-    number
+    nanogram,
+    row_counter,
+    col_counter,
+    condition_counter
 ):
-    assert number == 5
+    assert col_counter == 5
