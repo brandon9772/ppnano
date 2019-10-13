@@ -104,7 +104,7 @@ class Utilities:
         for (col_index, condition) in enumerate(nanogram.col_condition[
             col_counter: col_counter+row_size
         ]):
-            if finish_col & (1 << col_index):
+            if finish_col & (1 << col_index + col_counter):
                 continue
             not_possible = True
             for (condition_index, each_condition) in enumerate(condition):
@@ -120,7 +120,7 @@ class Utilities:
                            nanogram.answer[row_index] | bit_cross
                         )
                     nanogram.col_condition[
-                        col_index
+                        col_index + col_counter
                     ][condition_index][1] = True
                     cross_bottom_index = row_counter + each_condition[0]
                     if cross_bottom_index < nanogram.col_size:
@@ -128,6 +128,7 @@ class Utilities:
                             nanogram.must_cross[cross_bottom_index]
                             | bit_cross
                         )
+                    break
             if not_possible:
                 raise ValueError('impossible')
         return nanogram
