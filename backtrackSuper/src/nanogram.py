@@ -42,11 +42,13 @@ class Nanograms:
 
         for _ in range(self.row_size):
             condition = [[int(x), False] for x in f.readline().split(' ')]
+            condition.reverse()
             self.row_condition.append(condition)
 
         for _ in range(self.col_size):
             condition = [[int(x), False] for x in f.readline().split(' ')]
             self.col_condition.append(condition)
+        self.col_condition.reverse()
         f.close()
 
         # step:
