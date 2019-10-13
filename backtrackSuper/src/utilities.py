@@ -55,11 +55,12 @@ class Utilities:
         if not col_counter > max_col_counter:
             all_counter[-1][1] += 1
             if nanogram.must_cross[row_counter] & (1 << col_counter + 1):
-                return self.get_next_step(nanogram, all_counter)            
+                return self.get_next_step(nanogram, all_counter)
             return all_counter
         all_counter = all_counter[:-1]
         return self.get_next_step(nanogram, all_counter)
 
+    # @profile
     def chain_fill(self, nanogram, counter, right_cross_min=-1):
         nanogram = copy.deepcopy(nanogram)
         row_counter = counter[0]
@@ -67,7 +68,7 @@ class Utilities:
         condition_counter = counter[2]
         dtype_size = nanogram.dtype_size
         row_size = nanogram.row_condition[row_counter][condition_counter][0]
-        #fill row
+        # fill row
         row_fill = np.left_shift(
             (
                 np.right_shift(
@@ -117,7 +118,7 @@ class Utilities:
                         row_counter + each_condition[0]
                     ):
                         nanogram.answer[row_index] = (
-                           nanogram.answer[row_index] | bit_cross
+                            nanogram.answer[row_index] | bit_cross
                         )
                     nanogram.col_condition[
                         col_index + col_counter
@@ -140,7 +141,7 @@ class Utilities:
             if (fill & cross) != 0:
                 return False
         return True
-    
+
     def get_next_condition(self, nanogram, counter):
         next_counter = copy.deepcopy(counter)
         same_row = True

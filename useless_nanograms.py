@@ -1,6 +1,3 @@
-import copy
-import numpy as np
-
 from Nanograms import Nanograms
 from Utilities import Utilities
 

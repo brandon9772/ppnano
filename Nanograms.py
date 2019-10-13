@@ -57,7 +57,7 @@ class Nanograms:
         emptyArray = np.zeros((self.row_size, self.col_size), dtype=bool)
         self.current_answer = [emptyArray.copy()]
         self.must_fill = emptyArray.copy()
-        self.must_cross = emptyArray.copy()    
+        self.must_cross = emptyArray.copy()
 
     def printAnsFillCross(self):
         print('answer')
@@ -75,7 +75,7 @@ class Nanograms:
         print('col_condition_potential')
         print(list(self.col_condition_potential))
         print()
-    
+
     def nanogram_equal(self, nanogram):
         if not np.array_equal(self.must_fill, nanogram.must_fill):
             return False
@@ -145,4 +145,3 @@ class Nanograms:
                         start: start+self.row_condition[index][row_index]
                     ] = True
         return [is_solve, answer_arr]
-        

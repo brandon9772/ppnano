@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "D:\\python\\conda\\python.exe",
+    "python.pythonPath": "D:\\python\\conda\\envs\\brandon\\python.exe",
     "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,

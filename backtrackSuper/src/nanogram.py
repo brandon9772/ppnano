@@ -129,6 +129,3 @@ class Nanograms:
             for cell_row_out in row_out:
                 row_str += cell_row_out + ' '
             print(row_str)
-
-
-

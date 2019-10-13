@@ -33,6 +33,4 @@ def test_answer(
     expected_col_counter,
     expected_condition_counter,
 ):
-    
-
     assert True
