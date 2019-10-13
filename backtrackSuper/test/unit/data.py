@@ -1,30 +1,38 @@
+import numpy as np
 from pytest import param
-from nanogram import Nanograms
 
 
 class Data:
-    def test_answer(self):
-        variable = 'number'
+    def clean_zero_max_size(self):
+        variable = (
+            'filename,'
+            'expected_row_condition_change,'
+            'expected_col_condition_change,'
+            'expected_answer,'
+            'expected_must_cross'
+        )
         test_data = [
             param(
-                '3',
-                id='3'
+                'nanogram/all_one_5x5.txt',
+                [],
+                [],
+                np.zeros((self.col_size), dtype=self.dtype),
+                np.full(
+                    (self.col_size), ~0 >> self.row_size << self.row_size,
+                    dtype=self.dtype
+                ),
+                id='only_1_from_start_nanogram'
             )
         ]
         return (variable, test_data)
 
-    def test_get_next_step():
-        variable = (
-            'nanogram, row_counter,'
-            'col_counter, condition_counter'
-        )
+    def get_next_step(self):
+        variable = 'filename, expected_filename'
         test_data = [
             param(
-                Nanograms(r'5_5naongram_1.txt'),
-                0,
-                -1,
-                -1,
-                id='empty_all_zero_nanogram'
+                'nanogram/no_change.txt',
+                'expected_nanogram/no_change.txt',
+                id='no_change'
             )
         ]
         return (variable, test_data)

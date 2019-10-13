@@ -2,7 +2,17 @@ import numpy as np
 
 
 class Nanograms:
-    def __init__(self, filename):
+    def __init__(self, filename=None):
+        if filename is None:
+            self.row_size = None
+            self.col_size = None
+            self.row_condition = None
+            self.col_condition = None
+            self.dtype = None
+            self.dtype_size = None
+            self.answer = None
+            self.must_cross = None
+            return
         f = open(filename, 'r')
 
         # int
@@ -47,6 +57,25 @@ class Nanograms:
                 dtype=self.dtype
             )
 
+    def is_equal(self, nanograms):
+        if self.row_size != nanograms.row_size:
+            return False
+        if self.col_size != nanograms.col_size:
+            return False
+        if self.dtype != nanograms.dtype:
+            return False
+        if self.dtype_size != nanograms.dtype_size:
+            return False
+        if self.row_condition != nanograms.row_condition:
+            return False
+        if self.col_condition != nanograms.col_condition:
+            return False
+        if not np.array_equal(self.answer, nanograms.answer):
+            return False
+        if not np.array_equal(self.must_cross, nanograms.must_cross):
+            return False
+        return True
+
     def print_all(self):
         print(f'row size: {self.row_size}')
         print(f'col size: {self.col_size}')
@@ -65,6 +94,7 @@ class Nanograms:
                     np.binary_repr(cross, width=self.row_size)
                 )[self.dtype_size-self.col_size:]
             )
+        self.print_answer_must_cross()
 
     def print_answer_must_cross(self):
         out = np.empty((self.col_size, self.row_size), dtype=str)
@@ -73,8 +103,11 @@ class Nanograms:
             ans = map(int, str(np.binary_repr(ans, width=self.row_size)))
             cross = map(
                 int,
-                str(np.binary_repr(
-                    cross, width=self.row_size)
+                str(
+                    np.binary_repr(
+                        cross,
+                        width=self.row_size
+                    )
                 )[self.dtype_size-self.col_size:]
             )
             col = 0
