@@ -50,7 +50,7 @@ filename_list = [
 
 time_list = []
 solved_list = []
-answer_list = {}
+answer_dict = {}
 
 utilities = Utilities()
 solver = Solver(utilities)
@@ -62,12 +62,13 @@ for filename in filename_list:
     nanogram = Nanograms(filename)
     try:
         answer = solver.solve_nanogram(nanogram, max_iteration)
-        answer.print_all()
-        answer_list[filename] = answer
+        answer[0].print_all()
+        answer_dict[filename] = answer
         solved_list.append('solved')
         print('solved')
     except Exception as e:
         print(e)
+        answer_dict[filename] = [None, None]
         solved_list.append('unsolvable')
         print('unsolvable')
     end = time.time() - start
@@ -78,4 +79,6 @@ for (time_taken, filename, solve) in zip(
     filename_list,
     solved_list
 ):
-    print(f'{filename}: {time_taken} second. {solve}')
+    print(
+        f'{filename}: iteration: {answer_dict[filename][1]}, {time_taken} second. {solve}'
+    )

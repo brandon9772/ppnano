@@ -60,9 +60,9 @@ class Utilities:
         all_counter = all_counter[:-1]
         return self.get_next_step(nanogram, all_counter)
 
-    # @profile
-    def chain_fill(self, nanogram, counter, right_cross_min=-1):
-        nanogram = copy.deepcopy(nanogram)
+    def chain_fill(self, origin_nanogram, counter, right_cross_min=-1):
+        # nanogram = copy.deepcopy(origin_nanogram)
+        nanogram = origin_nanogram.copy()
         row_counter = counter[0]
         col_counter = counter[1]
         condition_counter = counter[2]

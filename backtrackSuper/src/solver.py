@@ -22,7 +22,12 @@ class Solver:
             # print(all_counter)
             # print(len(step_answer))
             # print('-----')
-            all_counter = self.utilities.get_next_step(nanogram, all_counter)
+            try:
+                all_counter = self.utilities.get_next_step(
+                    nanogram, all_counter)
+            except Exception as e:
+                print(iteration)
+                raise e
             # print('next step')
             # print(all_counter)
             # print('------------------')
@@ -67,4 +72,4 @@ class Solver:
         if iteration == max_iteration:
             print(len(step_answer))
             raise ValueError('out of iteration')
-        return step_answer[-1]
+        return (step_answer[-1], iteration)

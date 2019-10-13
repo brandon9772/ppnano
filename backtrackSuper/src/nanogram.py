@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 
 
@@ -55,9 +56,9 @@ class Nanograms:
         # [[row_counter, col_counter, condition_counter]]
         self.answer = np.zeros((self.col_size), dtype=self.dtype)
         self.must_cross = np.full(
-                (self.col_size), ~0 >> self.row_size << self.row_size,
-                dtype=self.dtype
-            )
+            (self.col_size), ~0 >> self.row_size << self.row_size,
+            dtype=self.dtype
+        )
 
     def is_equal(self, nanograms):
         if self.row_size != nanograms.row_size:
@@ -129,3 +130,36 @@ class Nanograms:
             for cell_row_out in row_out:
                 row_str += cell_row_out + ' '
             print(row_str)
+
+    @profile
+    def copy(self):
+        return copy.deepcopy(self)
+        nanogram = Nanograms()
+        nanogram.row_size = self.row_size
+        nanogram.col_size = self.col_size
+        nanogram.row_condition = [
+            [
+                [
+                    [
+                        copy_condition for copy_condition in each_condition
+                    ] for each_condition in row_condition
+                ]
+            ] for row_condition in self.row_condition
+        ]
+        nanogram.col_condition = [
+            [
+                [
+                    [
+                        copy_condition for copy_condition in each_condition
+                    ] for each_condition in condition
+                ]
+            ] for condition in self.col_condition
+        ]
+
+        # nanogram.row_condition = self.row_condition
+        # nanogram.col_condition = self.col_condition
+        nanogram.dtype = self.dtype
+        nanogram.dtype_size = self.dtype_size
+        nanogram.answer = self.answer.copy()
+        nanogram.must_cross = self.must_cross.copy()
+        return nanogram
