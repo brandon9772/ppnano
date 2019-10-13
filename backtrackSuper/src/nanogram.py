@@ -5,24 +5,28 @@ import numpy as np
 class Nanograms:
     def __init__(self, filename=None):
         if filename is None:
-            self.row_size = None
-            self.col_size = None
-            self.row_condition = None
-            self.col_condition = None
-            self.dtype = None
-            self.dtype_size = None
-            self.answer = None
-            self.must_cross = None
+            # self.row_size = None
+            # self.col_size = None
+            # self.row_condition = None
+            # self.col_condition = None
+            # self.row_condition_bool = None
+            # self.col_condition_bool = None
+            # self.dtype = None
+            # self.dtype_size = None
+            # self.answer = None
+            # self.must_cross = None
             return
         f = open(filename, 'r')
 
         # int
-        self.row_size = int(f.readline())
         self.col_size = int(f.readline())
+        self.row_size = int(f.readline())
 
         # [[[int: bool]]]
         self.row_condition = []
         self.col_condition = []
+        self.row_condition_bool = []
+        self.col_condition_bool = []
 
         if self.row_size > 64 or self.col_size > 64:
             raise ValueError(
@@ -41,15 +45,21 @@ class Nanograms:
             self.dtype = 'uint8'
             self.dtype_size = 8
 
-        for _ in range(self.row_size):
-            condition = [[int(x), False] for x in f.readline().split(' ')]
-            condition.reverse()
-            self.row_condition.append(condition)
-
         for _ in range(self.col_size):
-            condition = [[int(x), False] for x in f.readline().split(' ')]
+            condition = [int(x) for x in f.readline().split(' ')]
+            condition_bool = [False for _ in condition]
+            condition.reverse()
+            condition_bool.reverse()
+            self.row_condition.append(condition)
+            self.row_condition_bool.append(condition_bool)
+
+        for _ in range(self.row_size):
+            condition = [int(x) for x in f.readline().split(' ')]
+            condition_bool = [False for _ in condition]
             self.col_condition.append(condition)
+            self.col_condition_bool.append(condition_bool)
         self.col_condition.reverse()
+        self.col_condition_bool.reverse()
         f.close()
 
         # step:
@@ -73,6 +83,10 @@ class Nanograms:
             return False
         if self.col_condition != nanograms.col_condition:
             return False
+        if self.row_condition_bool != nanograms.row_condition_bool:
+            return False
+        if self.col_condition_bool != nanograms.col_condition_bool:
+            return False
         if not np.array_equal(self.answer, nanograms.answer):
             return False
         if not np.array_equal(self.must_cross, nanograms.must_cross):
@@ -86,6 +100,10 @@ class Nanograms:
         print(self.row_condition)
         print('col condition:')
         print(self.col_condition)
+        print('row condition bool:')
+        print(self.row_condition_bool)
+        print('col condition bool:')
+        print(self.col_condition_bool)
 
         print('answer')
         for ans in self.answer:
@@ -95,7 +113,7 @@ class Nanograms:
             print(
                 str(
                     np.binary_repr(cross, width=self.row_size)
-                )[self.dtype_size-self.col_size:]
+                )[self.dtype_size-self.row_size:]
             )
         self.print_answer_must_cross()
 
@@ -103,16 +121,16 @@ class Nanograms:
         out = np.empty((self.col_size, self.row_size), dtype=str)
         row = 0
         for (ans, cross) in zip(self.answer, self.must_cross):
-            ans = map(int, str(np.binary_repr(ans, width=self.row_size)))
-            cross = map(
+            ans = list(map(int, str(np.binary_repr(ans, width=self.row_size))))
+            cross = list(map(
                 int,
                 str(
                     np.binary_repr(
                         cross,
                         width=self.row_size
                     )
-                )[self.dtype_size-self.col_size:]
-            )
+                )[self.dtype_size-self.row_size:]
+            ))
             col = 0
             for (ans_cell, cross_cell) in zip(ans, cross):
                 if ans_cell == 1 and cross_cell == 1:
@@ -131,33 +149,22 @@ class Nanograms:
                 row_str += cell_row_out + ' '
             print(row_str)
 
-    # @profile
     def copy(self):
-        return copy.deepcopy(self)
         nanogram = Nanograms()
         nanogram.row_size = self.row_size
         nanogram.col_size = self.col_size
-        nanogram.row_condition = [
+        nanogram.row_condition = self.row_condition
+        nanogram.col_condition = self.col_condition
+        nanogram.row_condition_bool = [
             [
-                [
-                    [
-                        copy_condition for copy_condition in each_condition
-                    ] for each_condition in row_condition
-                ]
-            ] for row_condition in self.row_condition
+                each_condition for each_condition in row
+            ] for row in self.row_condition_bool
         ]
-        nanogram.col_condition = [
+        nanogram.col_condition_bool = [
             [
-                [
-                    [
-                        copy_condition for copy_condition in each_condition
-                    ] for each_condition in condition
-                ]
-            ] for condition in self.col_condition
+                each_condition for each_condition in col
+            ] for col in self.col_condition_bool
         ]
-
-        # nanogram.row_condition = self.row_condition
-        # nanogram.col_condition = self.col_condition
         nanogram.dtype = self.dtype
         nanogram.dtype_size = self.dtype_size
         nanogram.answer = self.answer.copy()

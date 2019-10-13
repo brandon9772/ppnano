@@ -11,20 +11,21 @@ class Utilities:
         for (i, condition) in enumerate(nanogram.row_condition):
             if len(condition) != 1:
                 continue
-            if condition[0][0] == 0:
+            if condition[0] == 0:
                 nanogram.must_cross[i] = ~0
-            if condition[0][0] == row_size:
+            if condition[0] == row_size:
                 nanogram.answer[i] = full_row
+                nanogram.row_condition_bool[i][0] = True
         for (i, condition) in enumerate(nanogram.col_condition):
             if len(condition) != 1:
                 continue
-            if condition[0][0] == 0:
+            if condition[0] == 0:
                 add_bit = 1 << i
                 for j in range(col_size):
                     nanogram.must_cross[j] = (
                         nanogram.must_cross[j] | add_bit
                     )
-            if condition[0][0] == col_size:
+            if condition[0] == col_size:
                 add_bit = 1 << i
                 for j in range(col_size):
                     nanogram.answer[j] = (
@@ -48,7 +49,7 @@ class Utilities:
         for condition in nanogram.row_condition[
             row_counter
         ][condition_counter:]:
-            max_col_counter += condition[0] + 1
+            max_col_counter += condition + 1
 
         max_col_counter = nanogram.row_size - max_col_counter
 
@@ -67,7 +68,7 @@ class Utilities:
         col_counter = counter[1]
         condition_counter = counter[2]
         dtype_size = nanogram.dtype_size
-        row_size = nanogram.row_condition[row_counter][condition_counter][0]
+        row_size = nanogram.row_condition[row_counter][condition_counter]
         # fill row
         row_fill = np.left_shift(
             (
@@ -100,7 +101,7 @@ class Utilities:
             nanogram.must_cross[row_counter] = (
                 nanogram.must_cross[row_counter] | all_left_cross
             )
-        nanogram.row_condition[row_counter][condition_counter][1] = True
+        nanogram.row_condition_bool[row_counter][condition_counter] = True
         # fill col
         for (col_index, condition) in enumerate(nanogram.col_condition[
             col_counter: col_counter+row_size
@@ -109,21 +110,22 @@ class Utilities:
                 continue
             not_possible = True
             for (condition_index, each_condition) in enumerate(condition):
-                if not each_condition[1]:
+                if not nanogram.col_condition_bool[col_index + col_counter][condition_index]:
                     not_possible = False
                     # fill column
                     bit_cross = 1 << col_index + col_counter
                     for row_index in range(
                         row_counter,
-                        row_counter + each_condition[0]
+                        row_counter + each_condition
                     ):
                         nanogram.answer[row_index] = (
                             nanogram.answer[row_index] | bit_cross
                         )
-                    nanogram.col_condition[
-                        col_index + col_counter
-                    ][condition_index][1] = True
-                    cross_bottom_index = row_counter + each_condition[0]
+                    nanogram.col_condition_bool[
+                        col_index +
+                        col_counter
+                    ][condition_index] = True
+                    cross_bottom_index = row_counter + each_condition
                     if cross_bottom_index < nanogram.col_size:
                         nanogram.must_cross[cross_bottom_index] = (
                             nanogram.must_cross[cross_bottom_index]
@@ -153,7 +155,7 @@ class Utilities:
             same_row = False
         if same_row:
             next_col = (
-                nanogram.row_condition[counter[0]][counter[2]][0]
+                nanogram.row_condition[counter[0]][counter[2]]
                 + counter[1]
             )
             next_counter[1] = next_col

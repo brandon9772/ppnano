@@ -4,10 +4,10 @@ class Solver:
 
     def solve_nanogram(self, nanogram, max_iteration):
         all_counter = [[0, -1, 0]]
-        nanogram = self.utilities.clean_zero_max_size(nanogram)
+        # nanogram = self.utilities.clean_zero_max_size(nanogram)
         step_answer = [nanogram]
         last_counter = [
-            nanogram.row_size-1,
+            nanogram.col_size-1,
             len(nanogram.row_condition[-1]) - 1
         ]
         # loop
@@ -22,9 +22,11 @@ class Solver:
             # print(all_counter)
             # print(len(step_answer))
             # print('-----')
+            # step_answer[-1].print_all()
             try:
                 all_counter = self.utilities.get_next_step(
-                    nanogram, all_counter)
+                    nanogram, all_counter
+                )
             except Exception as e:
                 print(iteration)
                 raise e
@@ -42,7 +44,7 @@ class Solver:
                             all_counter[-2][0]
                         ][
                             all_counter[-2][2]
-                        ][0]
+                        ]
                         - 1
                     )
                 next_nanogram = self.utilities.chain_fill(
