@@ -131,7 +131,7 @@ class Nanograms:
                 row_str += cell_row_out + ' '
             print(row_str)
 
-    @profile
+    # @profile
     def copy(self):
         return copy.deepcopy(self)
         nanogram = Nanograms()
