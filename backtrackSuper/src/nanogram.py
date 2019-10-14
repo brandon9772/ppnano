@@ -120,6 +120,45 @@ class Nanograms:
     def print_answer_must_cross(self):
         out = np.empty((self.col_size, self.row_size), dtype=str)
         row = 0
+        max_col_header_size = 0
+        max_row_header_size = 0
+
+        for col_condition in self.col_condition:
+            max_col_header_size = max(max_col_header_size, len(col_condition))
+        for row_condition in self.row_condition:
+            max_row_header_size = max(max_row_header_size, len(row_condition))
+
+        col_header = [
+            [
+                '  ' for _ in range(self.row_size)
+            ]for _ in range(max_col_header_size)
+        ]
+        for (col_index, col_condition) in enumerate(reversed(self.col_condition)):
+            for (condition_index, condition) in enumerate(reversed(col_condition)):
+                if condition < 10:
+                    col_header[condition_index][col_index] = ' ' + \
+                        str(condition)
+                else:
+                    col_header[condition_index][col_index] = str(condition)
+        for headers in reversed(col_header):
+            col_header_str = (max_row_header_size)*'   ' + '  '
+            for each_line_header in headers:
+                col_header_str += each_line_header + ' '
+            print(col_header_str)
+        print(max_row_header_size * '   ' + (self.row_size + 1) * '---')
+        row_header = [
+            [
+                '  ' for _ in range(max_row_header_size)
+            ]for _ in range(self.col_size)
+        ]
+        for (row_index, row_condition) in enumerate(self.row_condition):
+            for (condition_index, condition) in enumerate(row_condition):
+                if condition < 10:
+                    row_header[row_index][condition_index] = ' ' + \
+                        str(condition)
+                else:
+                    row_header[row_index][condition_index] = str(condition)
+
         for (ans, cross) in zip(self.answer, self.must_cross):
             ans = list(map(int, str(np.binary_repr(ans, width=self.row_size))))
             cross = list(map(
@@ -136,17 +175,20 @@ class Nanograms:
                 if ans_cell == 1 and cross_cell == 1:
                     out[row, col] = '!'
                 elif ans_cell == 1 and cross_cell == 0:
-                    out[row, col] = 'X'
+                    out[row, col] = chr(9632)
                 elif ans_cell == 0 and cross_cell == 1:
-                    out[row, col] = 'O'
+                    out[row, col] = 'x'
                 elif ans_cell == 0 and cross_cell == 0:
                     out[row, col] = '_'
                 col += 1
             row += 1
-        for row_out in out:
+        for (header, row_out) in zip(row_header, out):
             row_str = ''
+            for each_header in reversed(header):
+                row_str = row_str + each_header + ' '
+            row_str += ' | '
             for cell_row_out in row_out:
-                row_str += cell_row_out + ' '
+                row_str += cell_row_out + '  '
             print(row_str)
 
     def copy(self):

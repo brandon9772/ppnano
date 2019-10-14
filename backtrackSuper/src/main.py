@@ -59,14 +59,14 @@ filename_list = [
         r'backtrackSuper'
         r'\question\q_4_20x20.txt'
     ),
-    (
-        r'backtrackSuper'
-        r'\question\q_1_5x2.txt'
-    ),
-    (
-        r'backtrackSuper'
-        r'\question\q_1_8x5.txt'
-    ),
+    # (
+    #     r'backtrackSuper'
+    #     r'\question\q_1_5x2.txt'
+    # ),
+    # (
+    #     r'backtrackSuper'
+    #     r'\question\q_1_8x5.txt'
+    # ),
     # (
     #     r'backtrackSuper'
     #     r'\question\q_1_25x25.txt'
@@ -85,7 +85,6 @@ for filename in filename_list:
     start = time.time()
     print(filename)
     nanogram = Nanograms(filename)
-    # nanogram.print_all()
     try:
         answer = solver.solve_nanogram(nanogram, max_iteration)
         end = time.time() - start
