@@ -45,6 +45,10 @@ class Nanograms:
             self.dtype = 'uint8'
             self.dtype_size = 8
 
+        # help att
+        self.all_one = np.asarray([~0], dtype=self.dtype)[0]
+        self.all_zero = np.asarray([0], dtype=self.dtype)[0]
+
         for _ in range(self.col_size):
             condition = [int(x) for x in f.readline().split(' ')]
             condition_bool = [False for _ in condition]
@@ -69,6 +73,20 @@ class Nanograms:
             (self.col_size), ~0 >> self.row_size << self.row_size,
             dtype=self.dtype
         )
+
+    def get_col_answer(self, column_index):
+        result = self.all_zero
+        for i, row in enumerate(self.answer):
+            if row & (1 << column_index):
+                result += 1 << i
+        return result
+
+    def get_col_must_cross(self, column_index):
+        result = self.all_zero
+        for i, row in enumerate(self.must_cross):
+            if row & (1 << column_index):
+                result += 1 << i
+        return result
 
     def is_equal(self, nanograms):
         if self.row_size != nanograms.row_size:
@@ -211,4 +229,6 @@ class Nanograms:
         nanogram.dtype_size = self.dtype_size
         nanogram.answer = self.answer.copy()
         nanogram.must_cross = self.must_cross.copy()
+        nanogram.all_one = self.all_one
+        nanogram.all_zero = self.all_zero
         return nanogram

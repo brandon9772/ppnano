@@ -2,6 +2,7 @@ class Solver:
     def __init__(self, utilities):
         self.utilities = utilities
 
+    @profile
     def solve_nanogram(self, nanogram, max_iteration):
         all_counter = [[0, -1, 0]]
         # nanogram = self.utilities.clean_zero_max_size(nanogram)
@@ -14,6 +15,7 @@ class Solver:
         next_nanogram = None
         iteration = 0
         for _ in range(max_iteration):
+            # while(True):
             iteration += 1
             # print('------------------')
             # print('iteration')
@@ -47,17 +49,30 @@ class Solver:
                         ]
                         - 1
                     )
-                next_nanogram = self.utilities.chain_fill(
+                (
+                    next_nanogram,
+                    row_start,
+                    row_end,
+                    col_start,
+                    col_end
+                ) = self.utilities.chain_fill(
                     step_answer[-1],
                     all_counter[-1],
                     right_cross_min
                 )
-                possible = self.utilities.is_possible(next_nanogram)
+                possible = self.utilities.is_possible(
+                    next_nanogram,
+                    row_start,
+                    row_end,
+                    col_start,
+                    col_end
+                )
             except Exception:
                 # print(e)
                 possible = False
             if possible:
                 # next_nanogram.print_all()
+                # input()
                 step_answer.append(next_nanogram)
                 if (
                     all_counter[-1][0] == last_counter[0] and

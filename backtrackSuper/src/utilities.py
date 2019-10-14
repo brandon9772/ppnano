@@ -55,7 +55,20 @@ class Utilities:
 
         if not col_counter > max_col_counter:
             all_counter[-1][1] += 1
-            if nanogram.must_cross[row_counter] & (1 << col_counter + 1):
+            condition_size = nanogram.row_condition[row_counter][condition_counter]
+            if nanogram.must_cross[row_counter] & (
+                np.left_shift(
+                    np.right_shift(
+                        nanogram.all_one,
+                        nanogram.dtype_size - condition_size
+                    ),
+                    col_counter + 1
+                )
+            ):
+                return self.get_next_step(nanogram, all_counter)
+            if nanogram.answer[row_counter] & (1 << col_counter):
+                return self.get_next_step(nanogram, all_counter)
+            if nanogram.answer[row_counter] & (1 << col_counter + condition_size + 1):
                 return self.get_next_step(nanogram, all_counter)
             return all_counter
         all_counter = all_counter[:-1]
@@ -73,7 +86,7 @@ class Utilities:
         row_fill = np.left_shift(
             (
                 np.right_shift(
-                    np.asarray([~0], dtype=nanogram.dtype)[0],
+                    nanogram.all_one,
                     dtype_size - row_size
                 )
             ),
@@ -85,7 +98,7 @@ class Utilities:
         right_cross = np.left_shift(
             (
                 np.right_shift(
-                    np.asarray([~0], dtype=nanogram.dtype)[0],
+                    nanogram.all_one,
                     dtype_size - col_counter + right_cross_min + 1
                 )
             ),
@@ -103,6 +116,7 @@ class Utilities:
             )
         nanogram.row_condition_bool[row_counter][condition_counter] = True
         # fill col
+        max_col_size = 0
         for (col_index, condition) in enumerate(nanogram.col_condition[
             col_counter: col_counter+row_size
         ]):
@@ -112,6 +126,7 @@ class Utilities:
             for (condition_index, each_condition) in enumerate(condition):
                 if not nanogram.col_condition_bool[col_index + col_counter][condition_index]:
                     not_possible = False
+                    max_col_size = max(max_col_size, each_condition)
                     # fill column
                     bit_cross = 1 << col_index + col_counter
                     for row_index in range(
@@ -134,14 +149,96 @@ class Utilities:
                     break
             if not_possible:
                 raise ValueError('impossible')
-        return nanogram
+        return (
+            nanogram,
+            row_counter,
+            row_counter + row_size,
+            col_counter,
+            col_counter + max_col_size + 1
+        )
 
-    def is_possible(self, nanogram):
+    @profile
+    def is_possible(
+        self,
+        nanogram,
+        row_start,
+        row_end,
+        col_start,
+        col_end
+    ):
         for (fill, cross) in zip(
             nanogram.answer, nanogram.must_cross
         ):
             if (fill & cross) != 0:
                 return False
+        if row_start < 0:
+            row_start = 0
+        elif row_start > nanogram.col_size:
+            row_start = nanogram.col_size
+        if row_end < 0:
+            row_end = 0
+        elif row_end > nanogram.col_size:
+            row_end = nanogram.col_size
+        for row in range(row_start, row_end):
+            cross = nanogram.must_cross[row]
+            condition_list = nanogram.row_condition[row]
+            streak_list = []
+            streak = 0
+            for i in bin(cross):
+                if i:
+                    streak += 1
+                else:
+                    if streak != 0:
+                        streak_list.append(streak)
+                        streak = 0
+            if streak != 0:
+                streak_list.append(streak)
+
+            streak_counter = 0
+            max_streak_counter = len(streak_list)
+            for condition in condition_list:
+                diff = streak_list[streak_counter] - condition
+                while(diff < 0):
+                    streak_counter += 1
+                    if streak_counter == max_streak_counter:
+                        return False
+                    diff = streak_list[streak_counter] - condition
+                streak_list[streak_counter] = diff - 1
+
+        if col_start < 0:
+            col_start = 0
+        elif col_start > nanogram.row_size:
+            col_start = nanogram.row_size
+        if col_end < 0:
+            col_end = 0
+        elif col_end > nanogram.row_size:
+            col_end = nanogram.row_size
+        for col in range(col_start, col_end):
+            cross = nanogram.get_col_must_cross(col)
+            condition_list = nanogram.col_condition[col]
+            streak_list = []
+            streak = 0
+            for i in range(nanogram.col_size):
+                if not cross & (1 << i):
+                    streak += 1
+                else:
+                    if streak != 0:
+                        streak_list.append(streak)
+                        streak = 0
+            if streak != 0:
+                streak_list.append(streak)
+            streak_counter = 0
+
+            max_streak_counter = len(streak_list)
+            for condition in condition_list:
+                diff = streak_list[streak_counter] - condition
+                while(diff < 0):
+                    streak_counter += 1
+                    if streak_counter == max_streak_counter:
+                        return False
+                    diff = streak_list[streak_counter] - condition
+                streak_list[streak_counter] = diff - 1
+
         return True
 
     def get_next_condition(self, nanogram, counter):
