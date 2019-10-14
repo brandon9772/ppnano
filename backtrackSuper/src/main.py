@@ -88,17 +88,19 @@ for filename in filename_list:
     # nanogram.print_all()
     try:
         answer = solver.solve_nanogram(nanogram, max_iteration)
+        end = time.time() - start
+        time_list.append(end)
         answer[0].print_all()
         answer_dict[filename] = answer
         solved_list.append('solved')
         print('solved')
     except Exception as e:
+        end = time.time() - start
+        time_list.append(end)
         print(e)
         answer_dict[filename] = [None, None]
         solved_list.append('unsolvable')
         print('unsolvable')
-    end = time.time() - start
-    time_list.append(end)
 
 for (time_taken, filename, solve) in zip(
     time_list,
